@@ -1,2 +1,6 @@
-spettacoli/*/
-*.asv
+spettacoli/
+build/
+dist/
+__pycache__/
+*.spec
+.mypy_cache/
