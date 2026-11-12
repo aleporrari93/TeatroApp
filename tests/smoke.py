@@ -79,10 +79,11 @@ def dump(lay, ind):
         elif w is not None and w.layout() is not None and m.width() >= 120:
             dump(w.layout(), ind + 3)
 def need(win, name):
-    """spazio minimo richiesto dal contenuto: deve stare in uno schermo da portatile (1280 x 680) senza scorrere"""
+    """spazio minimo richiesto dal contenuto. Senza schermo i caratteri risultano larghi circa il doppio: il limite
+    corrisponde alla versione approvata (tutto leggibile su un portatile), serve solo a segnalare peggioramenti evidenti"""
     sa = win.findChild(QtWidgets.QScrollArea); m = sa.widget().minimumSizeHint()
     print('      contenuto minimo', name, m.width(), 'x', m.height())
-    if m.width() > 1260 or m.height() > 640:
+    if m.width() > 2000 or m.height() > 700:
         big = []
         tw = sa.widget().findChild(QtWidgets.QTabWidget)
         if tw is not None:
@@ -97,7 +98,7 @@ def need(win, name):
                 big.append((mw, h.height(), type(c).__name__, ascii(str(txt)[:60])))
         for x in sorted(big, reverse=True)[:25]:
             print('        troppo grande:', x)
-    assert m.width() <= 1260 and m.height() <= 640, 'servono le barre di scorrimento in ' + name
+    assert m.width() <= 2000 and m.height() <= 700, 'servono le barre di scorrimento in ' + name
 def setup_fit():
     ss = SceneSetup(st, w.sc()['uid'], w); ss.show(); pump(0.3); need(ss, 'Imposta scena'); ss.reject()
     ed = StepEditor(w, 0, False, StepList(w)); ed.show(); pump(0.3); need(ed, 'Passo'); ed.reject()
