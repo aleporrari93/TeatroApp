@@ -65,6 +65,19 @@ def big_windows():
     ed = StepEditor(w, 0, False, StepList(w)); ed.show(); pump(0.3); fits(ed); ed.reject()
 step('scena e passo nello schermo', big_windows)
 from teatro.setup import SceneSetup
+def dump(lay, ind):
+    for k in range(lay.count()):
+        it = lay.itemAt(k); m = it.minimumSize(); w = it.widget(); l = it.layout()
+        nm = type(w).__name__ if w else (type(l).__name__ if l else 'spazio')
+        txt = ''
+        if w is not None and hasattr(w, 'text') and callable(w.text):
+            txt = str(w.text())[:40]
+        if m.width() >= 120:
+            print(' ' * ind, nm, m.width(), 'x', m.height(), repr(txt))
+        if l is not None:
+            dump(l, ind + 3)
+        elif w is not None and w.layout() is not None and m.width() >= 120:
+            dump(w.layout(), ind + 3)
 def need(win, name):
     """spazio minimo richiesto dal contenuto: deve stare in uno schermo da portatile (1280 x 680) senza scorrere"""
     sa = win.findChild(QtWidgets.QScrollArea); m = sa.widget().minimumSizeHint()
@@ -75,6 +88,8 @@ def need(win, name):
         if tw is not None:
             for i in range(tw.count()):
                 h = tw.widget(i).minimumSizeHint(); print('        scheda', i, type(tw.widget(i)).__name__, h.width(), 'x', h.height())
+                if h.width() > 900:
+                    dump(tw.widget(i).layout(), 10)
         for c in sa.widget().findChildren(QtWidgets.QWidget):
             h = c.minimumSizeHint(); mw = max(h.width(), c.minimumWidth())
             txt = c.text() if hasattr(c, 'text') and callable(c.text) else (c.currentText() if hasattr(c, 'currentText') else '')
