@@ -69,6 +69,17 @@ def need(win, name):
     """spazio minimo richiesto dal contenuto: deve stare in uno schermo da portatile (1280 x 680) senza scorrere"""
     sa = win.findChild(QtWidgets.QScrollArea); m = sa.widget().minimumSizeHint()
     print('      contenuto minimo', name, m.width(), 'x', m.height())
+    if m.width() > 1260 or m.height() > 640:
+        big = []
+        for c in sa.widget().findChildren(QtWidgets.QWidget):
+            if not c.isVisibleTo(sa.widget()):
+                continue
+            h = c.minimumSizeHint(); mw = max(h.width(), c.minimumWidth())
+            txt = c.text() if hasattr(c, 'text') and callable(c.text) else (c.currentText() if hasattr(c, 'currentText') else '')
+            if mw > 300 or h.height() > 400:
+                big.append((mw, h.height(), type(c).__name__, str(txt)[:60]))
+        for x in sorted(big, reverse=True)[:25]:
+            print('        troppo grande:', x)
     assert m.width() <= 1260 and m.height() <= 640, 'servono le barre di scorrimento in ' + name
 def setup_fit():
     ss = SceneSetup(st, w.sc()['uid'], w); ss.show(); pump(0.3); need(ss, 'Imposta scena'); ss.reject()

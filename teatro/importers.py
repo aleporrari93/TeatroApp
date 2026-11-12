@@ -203,7 +203,7 @@ def _decimate(V, F, C, target):
     return V, F, C
 
 
-def normalize(P, yup):
+def normalize(P, yup, light=True):
     if yup:
         for p in P:
             v = p['V']; p['V'] = np.c_[v[:, 0], -v[:, 2], v[:, 1]]
@@ -211,7 +211,7 @@ def normalize(P, yup):
     big = (V.max(0) - V.min(0)).max()
     s = 0.001 if big > 300 else (0.01 if big > 30 else 1.0)
     V = V * s; mn = V.min(0); mx = V.max(0); c = np.array([(mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2, mn[2]])
-    nf = sum(len(p['F']) for p in P); ratio = min(1.0, 80000 / max(nf, 1))
+    nf = sum(len(p['F']) for p in P); ratio = min(1.0, 80000 / max(nf, 1)) if light else 1.0
     out = []
     for p in P:
         v = p['V'] * s - c; F = p['F']; C = np.asarray(p['C'], float)
@@ -234,7 +234,7 @@ def import_model(src, folder, yup=None):
         P = [dict(p) for p in L.load_npz_parts(src)]; yup = False if yup is None else yup
     else:
         raise ValueError('formato non supportato: ' + ext)
-    P = normalize(P, yup)
+    P = normalize(P, yup, light=(ext != '.npz'))        # i .npz sono gia' nel formato del programma: nessuna semplificazione
     V = np.vstack([p['V'] for p in P]); bb = (V.max(0) - V.min(0)).tolist()
     base = safe_name(os.path.splitext(os.path.basename(src))[0]) or 'modello'
     d = os.path.join(folder, 'modelli'); os.makedirs(d, exist_ok=True)
