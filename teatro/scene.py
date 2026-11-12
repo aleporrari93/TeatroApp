@@ -11,7 +11,7 @@ from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from . import model as M
 from . import pdfout
 from .planview import PlanView
-from .ui_common import BG, button, confirm, error, info, label
+from .ui_common import BG, button, confirm, error, fit_window, info, label, window_layout
 from .view3d import Preview3D, Stage3D
 
 
@@ -21,12 +21,12 @@ class SceneWindow(QtWidgets.QWidget):
         self.objs = []; self.pos = np.zeros((0, 2)); self.A = np.zeros(0)
         self.step = 0; self.running = False; self.anim = None; self.mode = None; self.view3 = False; self.built3 = False
         self.cueT = None; self.cueEnd = None; self.onsets = []; self.rec = False; self.recT = []; self.music = ''
-        self.setWindowTitle('Scena'); self.resize(1300, 900)
+        self.setWindowTitle('Scena'); fit_window(self, 1300, 900)
         self.player = QMediaPlayer(self); self.audio = QAudioOutput(self); self.player.setAudioOutput(self.audio)
         self.player.positionChanged.connect(self.on_pos); self.player.durationChanged.connect(self.on_dur)
         self.timer = QtCore.QTimer(self); self.timer.setInterval(33); self.timer.timeout.connect(self.tick)
         self.watch = QtCore.QTimer(self); self.watch.setInterval(40); self.watch.timeout.connect(self.watch_music)
-        lay = QtWidgets.QVBoxLayout(self)
+        lay = window_layout(self)
         top = QtWidgets.QHBoxLayout(); lay.addLayout(top)
         top.addWidget(button('◀', lambda: self.go(self.idx - 1), tip='Scena precedente'))
         top.addWidget(button('Elenco passi', self.step_list, True))
@@ -404,8 +404,8 @@ class SceneWindow(QtWidgets.QWidget):
         if not names:
             info(self, 'In questa scena non ci sono personaggi.'); return
         from . import library as L
-        d = QtWidgets.QDialog(self); d.setWindowTitle('Costumi  -  ' + sc['title']); d.resize(min(1600, 320 * len(names)), 620)
-        h = QtWidgets.QHBoxLayout(d)
+        d = QtWidgets.QDialog(self); d.setWindowTitle('Costumi  -  ' + sc['title']); fit_window(d, min(1600, 320 * len(names)), 620)
+        h = window_layout(d, QtWidgets.QHBoxLayout)
         for nm in names:
             ch = M.find_char(sh, nm)
             if not ch:
@@ -470,8 +470,8 @@ class CueTable(QtWidgets.QDialog):
         super().__init__(win); self.win = win; sc = win.sc(); n = len(sc['steps'])
         win.load_cues()
         self.T = list(win.cueT) if win.cueT else [float('nan')] * n; self.E = list(win.cueEnd) if win.cueEnd else [float('nan')] * n
-        self.setWindowTitle('Tempi dei passi — ' + sc['title']); self.resize(900, 600)
-        lay = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle('Tempi dei passi — ' + sc['title']); fit_window(self, 900, 600)
+        lay = window_layout(self)
         lay.addWidget(label('Tempi nel formato mm:ss.d (es. 01:12.4). Seleziona una riga e usa i pulsanti per spostarla.\n'
                             '"Fine" vuota = durata scritta nel passo; se la scrivi, il movimento dura fino a quel momento.', 'head'))
         self.tb = QtWidgets.QTableWidget(n, 4); self.tb.setHorizontalHeaderLabels(['Passo', 'Inizio', 'Fine', 'Descrizione'])
@@ -538,8 +538,8 @@ class CueTable(QtWidgets.QDialog):
 class StepList(QtWidgets.QDialog):
     def __init__(self, win):
         super().__init__(win); self.win = win; sc = win.sc()
-        self.setWindowTitle('Elenco passi — ' + sc['title']); self.resize(900, 640)
-        lay = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle('Elenco passi — ' + sc['title']); fit_window(self, 900, 640)
+        lay = window_layout(self)
         lay.addWidget(label('Passi della scena: %s\nDoppio clic su un passo per modificarlo.' % sc['title'], 'head'))
         self.lb = QtWidgets.QListWidget(); self.lb.itemDoubleClicked.connect(lambda *_: self.edit()); lay.addWidget(self.lb, 1)
         b = QtWidgets.QHBoxLayout(); lay.addLayout(b)

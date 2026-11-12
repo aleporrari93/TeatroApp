@@ -9,7 +9,7 @@ from . import importers as IM
 from . import library as L
 from . import model as M
 from .planview import PlanView
-from .ui_common import ColorButton, ask_text, button, confirm, error, info, label, num
+from .ui_common import ColorButton, ask_text, button, confirm, error, fit_window, info, label, num, window_layout
 from .view3d import Preview3D
 
 
@@ -36,8 +36,8 @@ def import_dialog(parent, folder):
 class SettingsDialog(QtWidgets.QWidget):
     def __init__(self, app, tab=0, wizard=False):
         super().__init__(); self.app = app; self._quiet = False
-        self.setWindowTitle('Impostazioni  -  ' + app.sh['title']); self.resize(1400, 860)
-        lay = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle('Impostazioni  -  ' + app.sh['title']); fit_window(self, 1400, 860)
+        lay = window_layout(self)
         self.tabs = QtWidgets.QTabWidget(); lay.addWidget(self.tabs, 1)
         self.tabs.addTab(TheaterTab(app), '  1. Teatro  ')
         self.tabs.addTab(LightsTab(app), '  2. Luci  ')

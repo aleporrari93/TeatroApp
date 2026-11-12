@@ -1,6 +1,28 @@
 """Stile e piccoli componenti condivisi dalle finestre."""
 from PySide6 import QtCore, QtGui, QtWidgets
 
+def _screen_rect():
+    scr = QtGui.QGuiApplication.screenAt(QtGui.QCursor.pos()) or QtGui.QGuiApplication.primaryScreen()
+    return scr.availableGeometry() if scr is not None else QtCore.QRect(0, 0, 1280, 720)
+
+
+def fit_window(w, width, height):
+    """dimensiona la finestra senza mai superare lo schermo (lascia spazio alla barra del titolo) e la centra"""
+    av = _screen_rect()
+    W = min(int(width), int(av.width() * 0.96)); H = min(int(height), int(av.height() * 0.90))
+    # setGeometry (non move/resize: alcune finestre hanno un loro metodo 'move'); 30 px per la barra del titolo
+    w.setGeometry(av.x() + max(0, (av.width() - W) // 2), av.y() + 30 + max(0, int((av.height() - 30 - H) * 0.35)), W, H)
+
+
+def window_layout(w, cls=None):
+    """layout principale della finestra dentro un'area scorrevole: se lo schermo e' piccolo compaiono le barre di scorrimento"""
+    outer = QtWidgets.QVBoxLayout(w); outer.setContentsMargins(0, 0, 0, 0)
+    sa = QtWidgets.QScrollArea(); sa.setWidgetResizable(True); sa.setFrameShape(QtWidgets.QFrame.NoFrame)
+    sa.setFocusPolicy(QtCore.Qt.NoFocus)
+    inner = QtWidgets.QWidget(); sa.setWidget(inner); outer.addWidget(sa)
+    return (cls or QtWidgets.QVBoxLayout)(inner)
+
+
 BG = '#14171c'; PANEL = '#21252b'; GOLD = '#d4b05a'; TXT = '#f2ede3'; DIM = '#b3aa9e'; HINT = '#ffd873'
 
 STYLE = """

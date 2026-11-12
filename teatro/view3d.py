@@ -114,10 +114,12 @@ class Stage3D(gl.GLViewWidget):
             except Exception:
                 done = False
         if T['back'] == 'Modello 3D' and T['backModel']:
-            self.addItem(_flat(*_quad(xa, xb, D + 0.5, D + 0.5, 0, H, True), bc))
-            for it in mesh_items(L.backdrop_parts(folder, T)):
+            BP = L.backdrop_parts(folder, T)
+            yb = max([D] + [float(p['V'][:, 1].max()) for p in BP if len(p['V'])]) + 0.3
+            self.addItem(_flat(*_quad(xa, xb, yb, yb, 0, H, True), (0.02, 0.02, 0.025)))    # nero dietro al modello
+            for it in mesh_items(BP):
                 self.addItem(it)
-            done = True
+            done = bool(BP)
         if not done:
             self.addItem(_flat(*_quad(xa, xb, D, D, 0, H, True), bc))
         for e in sh['elements']:

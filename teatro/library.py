@@ -162,15 +162,17 @@ def element_parts(folder, e):
 
 
 def backdrop_parts(folder, T):
+    """modello usato come fondale: largo quanto il palco (al massimo 1,4 volte l'altezza delle quinte), con la faccia
+    anteriore sul fondo del palco, cioe' al posto del fondale nero"""
     raw = load_npz_parts(os.path.join(folder, 'modelli', T['backModel']))
     P = _coloured(raw, None)
     if not P:
         return []
     V = np.vstack([p['V'] for p in P]); mn = V.min(0); mx = V.max(0)
-    k = (T['W'] + 2 * T['wing']) / max(mx[0] - mn[0], 1e-3)
+    k = min(T['W'] / max(mx[0] - mn[0], 1e-3), 1.4 * T['H'] / max(mx[2] - mn[2], 1e-3))
     for p in P:
         v = p['V'].copy()
-        v[:, 0] = (v[:, 0] - (mn[0] + mx[0]) / 2) * k; v[:, 1] = (v[:, 1] - mx[1]) * k + T['D']; v[:, 2] = (v[:, 2] - mn[2]) * k
+        v[:, 0] = (v[:, 0] - (mn[0] + mx[0]) / 2) * k; v[:, 1] = (v[:, 1] - mn[1]) * k + T['D']; v[:, 2] = (v[:, 2] - mn[2]) * k
         p['V'] = v
     return P
 

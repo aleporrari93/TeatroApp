@@ -6,7 +6,7 @@ from PySide6 import QtWidgets
 
 from . import model as M
 from .planview import PlanView
-from .ui_common import button, label
+from .ui_common import button, fit_window, label, window_layout
 
 
 class SceneSetup(QtWidgets.QDialog):
@@ -16,8 +16,8 @@ class SceneSetup(QtWidgets.QDialog):
         self.movable = [e for e in sh['elements'] if not e['fixed']]
         self.washes = [l for l in sh['lights'] if l['zone'] != M.FOLLOW]
         self.pending = None; self.drag = None
-        self.setWindowTitle('Imposta scena  -  ' + self.sc['title']); self.resize(1400, 840)
-        h = QtWidgets.QHBoxLayout(self); left = QtWidgets.QVBoxLayout(); h.addLayout(left, 3)
+        self.setWindowTitle('Imposta scena  -  ' + self.sc['title']); fit_window(self, 1400, 840)
+        h = window_layout(self, QtWidgets.QHBoxLayout); left = QtWidgets.QVBoxLayout(); h.addLayout(left, 3)
         self.plan = PlanView(); self.plan.title = "Posizioni all'inizio della scena  (pubblico in basso)"
         self.plan.set_context(sh, app.folder); left.addWidget(self.plan, 1)
         self.hint = label('', 'hint', True); left.addWidget(self.hint)

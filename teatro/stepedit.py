@@ -6,7 +6,7 @@ from PySide6 import QtWidgets
 
 from . import model as M
 from .planview import PlanView
-from .ui_common import button, error, label, num
+from .ui_common import button, error, fit_window, label, num, window_layout
 
 
 class StepEditor(QtWidgets.QDialog):
@@ -22,8 +22,8 @@ class StepEditor(QtWidgets.QDialog):
         self.FOL = [l for l in sh['lights'] if l['zone'] == M.FOLLOW] or \
                    [M.new_light('Occhio di bue', 'Seguipersona (occhio di bue)', 1, 'Bianco', [1, 1, 0.95], M.FOLLOW)]
         self.WL = [l for l in sh['lights'] if l['zone'] != M.FOLLOW]
-        self.setWindowTitle('Passo %d — %s' % (k + 1, sc['title'])); self.resize(1450, 880)
-        h = QtWidgets.QHBoxLayout(self); left = QtWidgets.QVBoxLayout(); h.addLayout(left, 3)
+        self.setWindowTitle('Passo %d — %s' % (k + 1, sc['title'])); fit_window(self, 1450, 880)
+        h = window_layout(self, QtWidgets.QHBoxLayout); left = QtWidgets.QVBoxLayout(); h.addLayout(left, 3)
         self.plan = PlanView(); self.plan.title = 'Pianta del palco  (pubblico in basso)'; self.plan.set_context(sh, win.app.folder)
         left.addWidget(self.plan, 1); self.hint = label('', 'hint', True); left.addWidget(self.hint)
         self.plan.pressed.connect(self.m_down); self.plan.moved.connect(self.m_move); self.plan.released.connect(self.m_up)

@@ -39,6 +39,12 @@ step('teatro: quinte', lambda: (s.tabs.widget(0).ed['nq'].setText('4'), s.tabs.w
 step('luci: aggiungi', lambda: (s.tabs.widget(1).lib.setCurrentRow(5), s.tabs.widget(1).add()))
 step('scenografia: aggiungi', lambda: (s.tabs.widget(2).lc.setCurrentRow(2), s.tabs.widget(2).add_lib()))
 step('personaggi: costume', lambda: (s.tabs.setCurrentIndex(3), s.tabs.widget(3).lp.setCurrentRow(0), s.tabs.widget(3).pIt[7].setCurrentIndex(2)))
+def fits(win):
+    av = app.primaryScreen().availableGeometry(); g = win.geometry()
+    print('     ', type(win).__name__, g.width(), 'x', g.height(), 'schermo', av.width(), 'x', av.height())
+    assert g.width() <= av.width() and g.height() <= av.height(), 'finestra piu\' grande dello schermo'
+    assert g.left() >= av.left() and g.top() >= av.top(), 'finestra fuori dallo schermo'
+step('impostazioni nello schermo', lambda: fits(s))
 pump(); step('chiudi impostazioni', s.close); pump()
 step('apri scena', lambda: (sw.lb.setCurrentRow(1), sw.open_scene())); pump()
 w = st.scene_win
@@ -51,6 +57,10 @@ def edit():
     sl = StepList(w); ed = StepEditor(w, len(w.sc()['steps']), True, sl)
     ed.pC.setCurrentIndex(0); ed.m_down(1, 2, 1); ed.add_action(); ed.save()
 step('nuovo passo', edit)
+def big_windows():
+    fits(w); fits(st.show_win)
+    ed = StepEditor(w, 0, False, StepList(w)); ed.show(); pump(0.3); fits(ed); ed.reject()
+step('scena e passo nello schermo', big_windows)
 from teatro.setup import SceneSetup
 step('imposta scena', lambda: SceneSetup(st, w.sc()['uid'], w).save())
 from teatro import pdfout

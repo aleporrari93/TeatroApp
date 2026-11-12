@@ -11,7 +11,7 @@ from . import model as M
 from . import pdfout
 from .demo import make_demo
 from .paths import shows_dir
-from .ui_common import ask_text, button, confirm, error, info, label, open_folder
+from .ui_common import ask_text, button, fit_window, window_layout, confirm, error, info, label, open_folder
 
 
 class App:
@@ -56,8 +56,8 @@ class App:
 class HomeWindow(QtWidgets.QWidget):
     def __init__(self, app):
         super().__init__(); self.app = app; app.home = self; self.list = []
-        self.setWindowTitle('Teatro  -  i miei spettacoli'); self.resize(980, 640)
-        lay = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle('Teatro  -  i miei spettacoli'); fit_window(self, 980, 640)
+        lay = window_layout(self)
         lay.addWidget(label('I MIEI SPETTACOLI', 'title'))
         lay.addWidget(label('Doppio clic su uno spettacolo per aprirlo. Ogni spettacolo si salva da solo nella sua cartella.', 'dim'))
         h = QtWidgets.QHBoxLayout(); lay.addLayout(h, 1)
@@ -176,8 +176,8 @@ class HomeWindow(QtWidgets.QWidget):
 class ShowWindow(QtWidgets.QWidget):
     def __init__(self, app):
         super().__init__(); self.app = app; self._quiet = False
-        self.setWindowTitle('Spettacolo  -  ' + app.sh['title']); self.resize(1100, 720)
-        lay = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle('Spettacolo  -  ' + app.sh['title']); fit_window(self, 1100, 720)
+        lay = window_layout(self)
         self.title = label(app.sh['title'], 'title'); lay.addWidget(self.title)
         self.info = label('', 'dim'); lay.addWidget(self.info)
         top = QtWidgets.QHBoxLayout(); lay.addLayout(top)
