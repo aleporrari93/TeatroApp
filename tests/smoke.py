@@ -73,7 +73,7 @@ def dump(lay, ind):
         if w is not None and hasattr(w, 'text') and callable(w.text):
             txt = str(w.text())[:40]
         if m.width() >= 120:
-            print(' ' * ind, nm, m.width(), 'x', m.height(), repr(txt))
+            print(' ' * ind, nm, m.width(), 'x', m.height(), ascii(txt))
         if l is not None:
             dump(l, ind + 3)
         elif w is not None and w.layout() is not None and m.width() >= 120:
@@ -94,7 +94,7 @@ def need(win, name):
             h = c.minimumSizeHint(); mw = max(h.width(), c.minimumWidth())
             txt = c.text() if hasattr(c, 'text') and callable(c.text) else (c.currentText() if hasattr(c, 'currentText') else '')
             if mw > 300 or h.height() > 400:
-                big.append((mw, h.height(), type(c).__name__, str(txt)[:60]))
+                big.append((mw, h.height(), type(c).__name__, ascii(str(txt)[:60])))
         for x in sorted(big, reverse=True)[:25]:
             print('        troppo grande:', x)
     assert m.width() <= 1260 and m.height() <= 640, 'servono le barre di scorrimento in ' + name
