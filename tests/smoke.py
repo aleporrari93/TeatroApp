@@ -71,9 +71,11 @@ def need(win, name):
     print('      contenuto minimo', name, m.width(), 'x', m.height())
     if m.width() > 1260 or m.height() > 640:
         big = []
+        tw = sa.widget().findChild(QtWidgets.QTabWidget)
+        if tw is not None:
+            for i in range(tw.count()):
+                h = tw.widget(i).minimumSizeHint(); print('        scheda', i, type(tw.widget(i)).__name__, h.width(), 'x', h.height())
         for c in sa.widget().findChildren(QtWidgets.QWidget):
-            if not c.isVisibleTo(sa.widget()):
-                continue
             h = c.minimumSizeHint(); mw = max(h.width(), c.minimumWidth())
             txt = c.text() if hasattr(c, 'text') and callable(c.text) else (c.currentText() if hasattr(c, 'currentText') else '')
             if mw > 300 or h.height() > 400:

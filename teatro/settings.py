@@ -176,7 +176,7 @@ class LightsTab(QtWidgets.QWidget):
         self.tb.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch); self.tb.verticalHeader().setVisible(False)
         self.tb.itemChanged.connect(self.name_changed); right.addWidget(self.tb, 1)
         b = QtWidgets.QHBoxLayout(); right.addLayout(b)
-        b.addWidget(button('Rimuovi la luce selezionata', self.remove)); b.addWidget(button('Colore personalizzato...', self.custom)); b.addStretch(1)
+        b.addWidget(button('Rimuovi', self.remove, tip='Rimuove la luce selezionata')); b.addWidget(button('Colore...', self.custom, tip='Colore personalizzato')); b.addStretch(1)
         right.addWidget(label('"Segue un personaggio" = occhio di bue / testa mobile: nei passi puo\' seguire un personaggio. '
                               'Le altre zone sono luci generali: nei passi scegli quali restano accese.', 'dim', True))
         self.fill()
@@ -250,7 +250,7 @@ class ElementsTab(QtWidgets.QWidget):
         c1.addWidget(label('Scenografia', 'title')); c1.addWidget(label('Elementi predefiniti (doppio clic per aggiungere)', 'dim'))
         self.lc = QtWidgets.QListWidget(); self.lc.addItems([c['name'] for c in self.cat]); self.lc.itemDoubleClicked.connect(lambda *_: self.add_lib())
         c1.addWidget(self.lc, 1); c1.addWidget(button('Aggiungi ▶', self.add_lib, True))
-        c1.addWidget(button('Importa modello 3D (.glb, .obj)...', self.add_import))
+        c1.addWidget(button('Importa modello 3D...', self.add_import, tip='File .glb, .obj o .npz'))
         c2 = QtWidgets.QVBoxLayout(); h.addLayout(c2, 2)
         c2.addWidget(label('Elementi di questo spettacolo', 'dim'))
         self.le = QtWidgets.QListWidget(); self.le.currentRowChanged.connect(lambda *_: self.show_el()); c2.addWidget(self.le, 1)
@@ -272,7 +272,7 @@ class ElementsTab(QtWidgets.QWidget):
         self.eO = QtWidgets.QPlainTextEdit(); self.eO.setMaximumHeight(90); f.addRow('Occorrente', self.eO)
         self.eH = QtWidgets.QPlainTextEdit(); self.eH.setMaximumHeight(130); f.addRow('Come costruirlo', self.eH)
         self.eO.textChanged.connect(self.read_text); self.eH.textChanged.connect(self.read_text)
-        self.prev = Preview3D(); h.addWidget(self.prev, 3)
+        self.prev = Preview3D(); self.prev.setMinimumSize(180, 200); c2.addWidget(self.prev, 1)
         self.fill(); self.show_el()
 
     def cur(self):
@@ -384,9 +384,10 @@ class CharsTab(QtWidgets.QWidget):
         self.bSk = ColorButton(title='Colore della pelle'); self.bSk.changed.connect(self.skin_custom)
         self.pEy = QtWidgets.QComboBox(); self.pEy.addItems([e[0] for e in M.EYES]); self.pEy.currentIndexChanged.connect(lambda *_: self.read_char())
         g.addWidget(QtWidgets.QLabel('Nome'), 0, 0); g.addWidget(self.eNm, 0, 1); g.addWidget(QtWidgets.QLabel('Pedina'), 0, 2); g.addWidget(self.bPw, 0, 3)
-        g.addWidget(QtWidgets.QLabel('Corpo'), 0, 4); g.addWidget(self.pSx, 0, 5); g.addWidget(QtWidgets.QLabel('Altezza (m)'), 0, 6); g.addWidget(self.eHt, 0, 7)
-        g.addWidget(QtWidgets.QLabel('Pelle'), 1, 0); g.addWidget(self.pSk, 1, 1); g.addWidget(self.bSk, 1, 3)
-        g.addWidget(QtWidgets.QLabel('Occhi'), 1, 4); g.addWidget(self.pEy, 1, 5)
+        g.addWidget(QtWidgets.QLabel('Corpo'), 1, 0); g.addWidget(self.pSx, 1, 1); g.addWidget(QtWidgets.QLabel('Altezza'), 1, 2); g.addWidget(self.eHt, 1, 3)
+        g.addWidget(QtWidgets.QLabel('Pelle'), 2, 0); g.addWidget(self.pSk, 2, 1); g.addWidget(self.bSk, 2, 3)
+        g.addWidget(QtWidgets.QLabel('Occhi'), 3, 0); g.addWidget(self.pEy, 3, 1)
+        self.eHt.setToolTip('Altezza in metri')
         mid.addWidget(label('COSTUMI', 'head'))
         hc = QtWidgets.QHBoxLayout(); mid.addLayout(hc)
         self.lc = QtWidgets.QListWidget(); self.lc.setMaximumHeight(110); self.lc.currentRowChanged.connect(lambda *_: self.show_costume()); hc.addWidget(self.lc, 2)
@@ -396,7 +397,7 @@ class CharsTab(QtWidgets.QWidget):
         vm = QtWidgets.QVBoxLayout(); hc.addLayout(vm, 2)
         vm.addWidget(QtWidgets.QLabel('Il costume viene'))
         self.pMd = QtWidgets.QComboBox(); self.pMd.addItems(['dalla libreria', 'da un modello importato']); self.pMd.currentIndexChanged.connect(self.read_mode)
-        vm.addWidget(self.pMd); self.bIm = button('Importa modello 3D (.glb, .obj)...', self.import_costume); vm.addWidget(self.bIm)
+        vm.addWidget(self.pMd); self.bIm = button('Importa modello 3D...', self.import_costume, tip='File .glb, .obj o .npz'); vm.addWidget(self.bIm)
         self.tIm = label('', 'dim'); vm.addWidget(self.tIm); vm.addStretch(1)
         cols = QtWidgets.QHBoxLayout(); mid.addLayout(cols, 1)
         gs = QtWidgets.QGridLayout(); cols.addLayout(gs, 1); gs.addWidget(label('CAPI  (colore con il quadratino)', 'head'), 0, 0, 1, 3)
@@ -427,7 +428,7 @@ class CharsTab(QtWidgets.QWidget):
             gm.addWidget(ch, r, 0, 1, 2); gm.addWidget(bt, r, 2); self.cMk.append(ch); self.bMk.append(bt)
         gm.addWidget(label('Un "Abito intero" sostituisce maglia e pantaloni. Anteprima: trascina per ruotare, rotella per lo zoom.', 'dim', True), 9, 0, 1, 3)
         gm.setRowStretch(10, 1)
-        self.prev = Preview3D(); h.addWidget(self.prev, 4)
+        self.prev = Preview3D(); self.prev.setMinimumSize(180, 220); c1.addWidget(self.prev, 2)
         self.lib_widgets = self.pIt + self.bIt + [self.pHr, self.pFc, self.pBr, self.bHr, self.bFc, self.bBr] + self.cMk + self.bMk
         self.fill(); self.show_char()
 
