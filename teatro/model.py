@@ -198,6 +198,16 @@ def set_cast(sc, name, code):
     sc['cast'].append(dict(name=name, code=code))
 
 
+def short_desc(co, n=34):
+    """nome breve del costume (la parte prima di ':' o ';'), per elenchi e didascalie"""
+    s = str(co.get('desc', '') or '').replace('\n', ' ')
+    for sep in (':', ';', ' - '):
+        if sep in s:
+            s = s.split(sep)[0]
+    s = s.strip()
+    return s if len(s) <= n else s[:n - 1].rstrip() + '…'
+
+
 def find_char(sh, name):
     for c in sh['chars']:
         if c['name'] == name:

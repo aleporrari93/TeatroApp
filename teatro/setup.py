@@ -73,7 +73,7 @@ class SceneSetup(QtWidgets.QDialog):
         r = self.lc.currentRow(); C = self.app.sh['chars']
         if not 0 <= r < len(C):
             return
-        ch = C[r]; self.pco.clear(); self.pco.addItems(['%s  -  %s' % (x['code'], x['desc']) for x in ch['costumes']])
+        ch = C[r]; self.pco.clear(); self.pco.addItems(['%s  -  %s' % (x['code'], M.short_desc(x)) for x in ch['costumes']])
         code = M.cast_code(self.app.sh, self.sc, ch['name'])
         self.pco.setCurrentIndex(next((i for i, x in enumerate(ch['costumes']) if x['code'] == code), 0))
 

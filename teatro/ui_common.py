@@ -14,10 +14,23 @@ def fit_window(w, width, height):
     w.setGeometry(av.x() + max(0, (av.width() - W) // 2), av.y() + 30 + max(0, int((av.height() - 30 - H) * 0.35)), W, H)
 
 
+def compact(w):
+    """evita che testi lunghi allarghino la finestra: menu a tendina e scritte si adattano alla larghezza"""
+    for cb in w.findChildren(QtWidgets.QComboBox):
+        cb.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon); cb.setMinimumContentsLength(8)
+    for lb in w.findChildren(QtWidgets.QLabel):
+        if not lb.wordWrap() and len(lb.text()) > 40:
+            lb.setWordWrap(True)
+
+
 def screen_limit(w):
     """la finestra non puo' diventare piu' grande dello schermo (barra del titolo compresa) ne' uscirne"""
     if not w.isWindow():
         return
+    try:
+        compact(w)
+    except Exception:
+        pass
     av = _screen_rect(); mw, mh = av.width() - 16, av.height() - 40
     w.setMaximumSize(mw, mh)
     g = w.geometry(); W = min(g.width(), mw); H = min(g.height(), mh)

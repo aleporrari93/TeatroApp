@@ -489,7 +489,7 @@ class CharsTab(QtWidgets.QWidget):
         self.pSk.setCurrentIndex(k); self.bSk.set_rgb(c['skin'])
         self.pEy.setCurrentIndex(min(range(len(M.EYES)), key=lambda i: sum((a - b) ** 2 for a, b in zip(M.EYES[i][1], c['eyes']))))
         j = max(0, self.lc.currentRow()); self.lc.clear()
-        self.lc.addItems(['%s  -  %s' % (x['code'], x['desc']) for x in c['costumes']]); self.lc.setCurrentRow(min(j, len(c['costumes']) - 1))
+        self.lc.addItems(['%s  -  %s' % (x['code'], M.short_desc(x)) for x in c['costumes']]); self.lc.setCurrentRow(min(j, len(c['costumes']) - 1))
         self._fill = False
         self.show_costume()
 

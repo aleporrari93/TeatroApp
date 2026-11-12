@@ -404,16 +404,17 @@ class SceneWindow(QtWidgets.QWidget):
         if not names:
             info(self, 'In questa scena non ci sono personaggi.'); return
         from . import library as L
-        d = QtWidgets.QDialog(self); d.setWindowTitle('Costumi  -  ' + sc['title']); fit_window(d, min(1600, 320 * len(names)), 620)
-        h = window_layout(d, QtWidgets.QHBoxLayout)
+        n = len(names); cols = n if n <= 4 else (4 if n <= 8 else 5); rows = (n + cols - 1) // cols
+        d = QtWidgets.QDialog(self); d.setWindowTitle('Costumi  -  ' + sc['title']); fit_window(d, 300 * cols, 330 * rows + 40)
+        h = window_layout(d, QtWidgets.QGridLayout); k = 0
         for nm in names:
             ch = M.find_char(sh, nm)
             if not ch:
                 continue
             code = M.cast_code(sh, sc, nm); co = next((c for c in ch['costumes'] if c['code'] == code), ch['costumes'][0])
-            v = QtWidgets.QVBoxLayout(); h.addLayout(v)
-            p = Preview3D(); p.show_parts(L.char_parts(sh, self.app.folder, ch, code)); v.addWidget(p, 1)
-            t = label('%s\ncostume %s: %s' % (nm, co['code'], co['desc'])); t.setAlignment(QtCore.Qt.AlignCenter); v.addWidget(t)
+            v = QtWidgets.QVBoxLayout(); h.addLayout(v, k // cols, k % cols); k += 1
+            p = Preview3D(); p.setMinimumSize(140, 160); p.show_parts(L.char_parts(sh, self.app.folder, ch, code)); v.addWidget(p, 1)
+            t = label('%s  -  costume %s\n%s' % (nm, co['code'], M.short_desc(co))); t.setAlignment(QtCore.Qt.AlignCenter); v.addWidget(t)
         d.exec()
 
     def step_list(self):

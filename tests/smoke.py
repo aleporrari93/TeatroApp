@@ -65,6 +65,28 @@ def big_windows():
     ed = StepEditor(w, 0, False, StepList(w)); ed.show(); pump(0.3); fits(ed); ed.reject()
 step('scena e passo nello schermo', big_windows)
 from teatro.setup import SceneSetup
+def need(win, name):
+    """spazio minimo richiesto dal contenuto: deve stare in uno schermo da portatile (1280 x 680) senza scorrere"""
+    sa = win.findChild(QtWidgets.QScrollArea); m = sa.widget().minimumSizeHint()
+    print('      contenuto minimo', name, m.width(), 'x', m.height())
+    assert m.width() <= 1260 and m.height() <= 640, 'servono le barre di scorrimento in ' + name
+def setup_fit():
+    ss = SceneSetup(st, w.sc()['uid'], w); ss.show(); pump(0.3); need(ss, 'Imposta scena'); ss.reject()
+    ed = StepEditor(w, 0, False, StepList(w)); ed.show(); pump(0.3); need(ed, 'Passo'); ed.reject()
+    need(st.scene_win, 'Scena'); need(st.show_win, 'Spettacolo')
+    st.show_win.settings(0); pump(0.3)
+    for i in range(4):
+        st.settings.tabs.setCurrentIndex(i); pump(0.2); need(st.settings, 'Impostazioni scheda %d' % i)
+    st.settings.close(); pump()
+    seen = []
+    orig = QtWidgets.QDialog.exec
+    QtWidgets.QDialog.exec = lambda self: (self.show(), pump(0.3), seen.append(self), self.reject())
+    try:
+        st.scene_win.costumes()
+    finally:
+        QtWidgets.QDialog.exec = orig
+    need(seen[0], 'Costumi della scena')
+step('finestre leggibili senza scorrere', setup_fit)
 step('imposta scena', lambda: SceneSetup(st, w.sc()['uid'], w).save())
 from teatro import pdfout
 step('pdf copione', lambda: pdfout.script_pdf(os.path.join(tmp, 'c.pdf'), st.sh, st.folder))
