@@ -107,6 +107,14 @@ class StepEditor(QtWidgets.QDialog):
         for i, o in enumerate(self.objs):
             if o['kind'] == 'light' and o['label'] == lab:
                 return i
+        # una luce dello stesso tipo gia' accesa sul punto di partenza, non ancora legata a nessuno: si riusa quella
+        # (altrimenti resterebbe una seconda luce ferma dove il personaggio era)
+        for i, o in enumerate(self.objs):
+            if o['kind'] == 'light' and o['ref'] == Lt['name'] and o['zone'] == M.FOLLOW and ' su ' not in o['label'] \
+                    and self.cur_vis(i):
+                p = self.cur_pos(i)
+                if math.dist((o['x'] + p[0], o['y'] + p[1]), center) < 0.8:
+                    o['label'] = lab; return i
         return self.add_obj(M.new_obj(M.new_uid(self.sh), 'light', Lt['name'], lab, center[0], center[1], Lt['rgb'], Lt['zone']))
 
     def draw(self):
