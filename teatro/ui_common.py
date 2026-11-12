@@ -16,8 +16,9 @@ def fit_window(w, width, height):
 
 def compact(w):
     """evita che testi lunghi allarghino la finestra: menu a tendina e scritte si adattano alla larghezza"""
+    pol = getattr(QtWidgets.QComboBox, 'SizeAdjustPolicy', QtWidgets.QComboBox).AdjustToMinimumContentsLengthWithIcon
     for cb in w.findChildren(QtWidgets.QComboBox):
-        cb.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon); cb.setMinimumContentsLength(8)
+        cb.setSizeAdjustPolicy(pol); cb.setMinimumContentsLength(8)
     for lb in w.findChildren(QtWidgets.QLabel):
         if not lb.wordWrap() and len(lb.text()) > 40:
             lb.setWordWrap(True)
@@ -30,7 +31,7 @@ def screen_limit(w):
     try:
         compact(w)
     except Exception:
-        pass
+        import traceback; traceback.print_exc()
     av = _screen_rect(); mw, mh = av.width() - 16, av.height() - 40
     w.setMaximumSize(mw, mh)
     g = w.geometry(); W = min(g.width(), mw); H = min(g.height(), mh)
