@@ -19,6 +19,8 @@ def compact(w):
     pol = getattr(QtWidgets.QComboBox, 'SizeAdjustPolicy', QtWidgets.QComboBox).AdjustToMinimumContentsLengthWithIcon
     for cb in w.findChildren(QtWidgets.QComboBox):
         cb.setSizeAdjustPolicy(pol); cb.setMinimumContentsLength(8)
+        # Qt tiene in memoria la larghezza minima calcolata prima: un evento di cambio stile la ricalcola
+        QtWidgets.QApplication.sendEvent(cb, QtCore.QEvent(QtCore.QEvent.StyleChange)); cb.updateGeometry()
     for lb in w.findChildren(QtWidgets.QLabel):
         if not lb.wordWrap() and len(lb.text()) > 40:
             lb.setWordWrap(True)
@@ -33,6 +35,9 @@ def screen_limit(w):
     except Exception:
         import traceback; traceback.print_exc()
     av = _screen_rect(); mw, mh = av.width() - 16, av.height() - 40
+    lay = w.layout()
+    if lay is not None:
+        lay.invalidate(); lay.activate()
     w.setMaximumSize(mw, mh)
     g = w.geometry(); W = min(g.width(), mw); H = min(g.height(), mh)
     x = min(max(g.x(), av.x() + 8), av.x() + av.width() - W - 8); y = min(max(g.y(), av.y() + 32), av.y() + av.height() - H - 8)
@@ -44,6 +49,9 @@ class ScreenGuard(QtCore.QObject):
     """applicato a tutta l'applicazione: ogni finestra che si apre viene tenuta dentro lo schermo"""
     def eventFilter(self, obj, ev):
         try:
+            if ev.type() == QtCore.QEvent.Polish and isinstance(obj, QtWidgets.QComboBox):
+                obj.setSizeAdjustPolicy(getattr(QtWidgets.QComboBox, 'SizeAdjustPolicy', QtWidgets.QComboBox).AdjustToMinimumContentsLengthWithIcon)
+                obj.setMinimumContentsLength(8)
             if ev.type() == QtCore.QEvent.Show and isinstance(obj, QtWidgets.QWidget) and obj.isWindow() \
                     and obj.windowType() in (QtCore.Qt.Window, QtCore.Qt.Dialog):
                 screen_limit(obj)
