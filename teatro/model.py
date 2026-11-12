@@ -430,8 +430,8 @@ def quinte_y(T):
 def zone_geom(zone, T, p=(0, 0)):
     W, D, P = T['W'], T['D'], T['P']
     g = dict(shape='rect', cx=0.0, cy=D / 2, w=W, h=D, r=1.0)
-    if zone == 'Tutto il palco':                     # tutto il palco, proscenio escluso
-        g.update(cy=D / 2, h=D)
+    if zone == 'Tutto il palco':                     # dal fondale al bordo del proscenio, sempre nelle misure attuali
+        g.update(cy=(D - P) / 2, h=D + P)
     elif zone == 'Avanti':
         g.update(cy=(-P + 0.4 * D) / 2, h=0.4 * D + P)
     elif zone == 'Centro':
