@@ -22,7 +22,7 @@ def compact(w):
         # Qt tiene in memoria la larghezza minima calcolata prima: un evento di cambio stile la ricalcola
         QtWidgets.QApplication.sendEvent(cb, QtCore.QEvent(QtCore.QEvent.StyleChange)); cb.updateGeometry()
     for lb in w.findChildren(QtWidgets.QLabel):
-        if not lb.wordWrap() and len(lb.text()) > 40:
+        if not lb.wordWrap() and len(lb.text()) > 14 and not lb.property('title'):
             lb.setWordWrap(True)
 
 
