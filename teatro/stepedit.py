@@ -79,7 +79,7 @@ class StepEditor(QtWidgets.QDialog):
         return list(c)
 
     def cur_vis(self, ip):
-        a = self.st0[ip][2] > 0.5
+        a = bool(self.st0[ip][2] > 0.5)
         for e in self.eff:
             if e['spid'] == self.objs[ip]['id']:
                 if e['cls'] == 'entr':
@@ -244,11 +244,11 @@ class StepEditor(QtWidgets.QDialog):
 
     def wash_sel(self):
         for q in range(len(self.WL)):
-            wi = self.wash_obj(q); self.lw.item(q).setSelected(wi is not None and self.cur_vis(wi))
+            wi = self.wash_obj(q); self.lw.item(q).setSelected(bool(wi is not None and self.cur_vis(wi)))
 
     def wash_prev(self):
         for q in range(len(self.WL)):
-            wi = self.wash_obj(q); self.lw.item(q).setSelected(wi is not None and self.st0[wi][2] > 0.5)
+            wi = self.wash_obj(q); self.lw.item(q).setSelected(bool(wi is not None and self.st0[wi][2] > 0.5))
 
     def apply_wash(self):
         sel = {i.row() for i in self.lw.selectedIndexes()}

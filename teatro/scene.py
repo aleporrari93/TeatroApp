@@ -438,8 +438,15 @@ class SceneWindow(QtWidgets.QWidget):
         for i, o in enumerate(self.objs):
             self.v3d.place(i, o, stv[i, 0], stv[i, 1], stv[i, 2])
         QtWidgets.QApplication.processEvents()
-        img = self.v3d.grabFramebuffer()
-        fn = os.path.join(tempfile.mkdtemp(), 'vista3d.png'); img.save(fn)
+        fn = None
+        try:
+            img = self.v3d.grabFramebuffer()
+            if not img.isNull():
+                fn = os.path.join(tempfile.mkdtemp(), 'vista3d.png')
+                if not img.save(fn) or not os.path.exists(fn):
+                    fn = None
+        except Exception:
+            fn = None
         self.redraw()
         if not was3:
             self.toggle_view()

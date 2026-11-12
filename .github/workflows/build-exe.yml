@@ -20,7 +20,7 @@ jobs:
         continue-on-error: true
         run: python tests/smoke.py
       - name: Crea l'eseguibile
-        run: python -m PyInstaller --noconfirm --windowed --name TeatroApp --collect-all pyqtgraph --hidden-import OpenGL.platform.win32 main.py
+        run: python -m PyInstaller --noconfirm --windowed --name TeatroApp --collect-all pyqtgraph --exclude-module pyqtgraph.examples --exclude-module pyqtgraph.jupyter --hidden-import OpenGL.platform.win32 main.py
       - name: Prepara la cartella
         shell: pwsh
         run: |

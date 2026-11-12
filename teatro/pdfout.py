@@ -1,5 +1,6 @@
 """PDF della scena (testo + vista dalla platea) e dell'intero copione (solo testo)."""
 import math
+import os
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -80,7 +81,7 @@ def scene_story(sh, sc, cue_times=None):
 def scene_pdf(path, sh, sc, cue_times=None, image_png=None):
     doc = _Doc(path, sc['title'])
     S = scene_story(sh, sc, cue_times)
-    if image_png:
+    if image_png and os.path.exists(image_png):
         lw, lh = landscape(A4)
         from PIL import Image as PI
         iw, ih = PI.open(image_png).size
