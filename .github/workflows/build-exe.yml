@@ -6,6 +6,9 @@ on:
     branches: [main]
     paths: ['teatro/**', 'main.py', 'libreria/**', 'requirements.txt', 'build_exe.bat', '.github/workflows/build-exe.yml', 'tests/**']
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -31,3 +34,10 @@ jobs:
         with:
           name: TeatroApp_exe
           path: TeatroApp_exe.zip
+      - name: Pubblica nella pagina Release (ultima versione)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete ultima-versione --yes --cleanup-tag 2>$null
+          gh release create ultima-versione TeatroApp_exe.zip --title "TeatroApp - ultima versione (exe Windows)" --notes "Scarica TeatroApp_exe.zip, estrai la cartella e avvia TeatroApp.exe. Il manuale e' dentro la cartella." --latest
