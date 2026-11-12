@@ -172,7 +172,7 @@ class PlanView(QtWidgets.QWidget):
             f = p.font(); f.setPointSizeF(7); p.setFont(f)
             p.drawText(QtCore.QRectF(c.x() - 80, c.y() - 8, 160, 16), QtCore.Qt.AlignCenter, o['label'])
         else:
-            g = M.zone_geom(o['zone'], self.sh['theater'])
+            _, g, x, y = M.light_place(self.sh, o, dx, dy)
             col = qcol(o['rgb'], (0.7 if g['shape'] == 'cyc' else 0.22) * min(1, a))
             p.setPen(QtCore.Qt.NoPen); p.setBrush(col)
             if g['shape'] == 'circle':

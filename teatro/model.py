@@ -208,6 +208,18 @@ def short_desc(co, n=34):
     return s if len(s) <= n else s[:n - 1].rstrip() + '…'
 
 
+def light_place(sh, o, dx=0.0, dy=0.0):
+    """zona, geometria e centro di una luce in scena. Le luci generali seguono sempre la zona scelta nella scheda Luci
+    e le misure attuali del palco ("Tutto il palco" copre tutto il palco, anche se lo si ridimensiona)"""
+    ld = next((l for l in sh.get('lights', []) if l['name'] == o['ref']), None)
+    zone = ld['zone'] if ld else o['zone']
+    if zone == FOLLOW or o['zone'] == FOLLOW:
+        x, y = o['x'] + dx, o['y'] + dy
+        return FOLLOW, zone_geom(FOLLOW, sh['theater'], (x, y)), x, y
+    g = zone_geom(zone, sh['theater'])
+    return zone, g, g['cx'], g['cy']
+
+
 def find_char(sh, name):
     for c in sh['chars']:
         if c['name'] == name:
@@ -402,8 +414,8 @@ def quinte_y(T):
 def zone_geom(zone, T, p=(0, 0)):
     W, D, P = T['W'], T['D'], T['P']
     g = dict(shape='rect', cx=0.0, cy=D / 2, w=W, h=D, r=1.0)
-    if zone == 'Tutto il palco':
-        g.update(cy=(D - P) / 2, h=D + P)
+    if zone == 'Tutto il palco':                     # tutto il palco, proscenio escluso
+        g.update(cy=D / 2, h=D)
     elif zone == 'Avanti':
         g.update(cy=(-P + 0.4 * D) / 2, h=0.4 * D + P)
     elif zone == 'Centro':

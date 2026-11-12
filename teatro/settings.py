@@ -214,7 +214,17 @@ class LightsTab(QtWidgets.QWidget):
 
     def set_field(self, r, k, v):
         if not self._fill:
-            self.app.sh['lights'][r][k] = v
+            self.app.sh['lights'][r][k] = v; self.sync_scenes(r)
+
+    def sync_scenes(self, r):
+        """le luci gia' messe nelle scene prendono la nuova zona e il nuovo colore"""
+        Lt = self.app.sh['lights'][r]
+        for sc in self.app.sh['scenes']:
+            for o in sc['objects']:
+                if o['kind'] == 'light' and o['ref'] == Lt['name']:
+                    o['zone'] = Lt['zone']
+                    if Lt['zone'] != M.FOLLOW:
+                        o['rgb'] = list(Lt['rgb'])
 
     def set_colour(self, r, t):
         if self._fill:
@@ -227,7 +237,7 @@ class LightsTab(QtWidgets.QWidget):
                 Lt['rgb'] = [c.redF(), c.greenF(), c.blueF()]
         else:
             Lt['rgb'] = M.colour_of(t)
-        Lt['cname'] = t
+        Lt['cname'] = t; self.sync_scenes(r)
 
     def remove(self):
         r = self.tb.currentRow()

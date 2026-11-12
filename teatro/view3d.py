@@ -81,7 +81,7 @@ class Stage3D(gl.GLViewWidget):
         self.objs = []
 
     def build(self, sh, folder, sc, keep_camera=True):
-        self.clear_all()
+        self.clear_all(); self.sh = sh
         T = sh['theater']; W, D, P, wg, H = T['W'], T['D'], T['P'], T['wing'], T['H']
         xa, xb = -W / 2 - wg, W / 2 + wg
         self.addItem(_flat(*_quad(xa, xb, -P, D, 0, 0), (0.36, 0.27, 0.19)))
@@ -153,7 +153,7 @@ class Stage3D(gl.GLViewWidget):
             for it in its:
                 self.addItem(it)
             return Obj3D(its, o['rot'])
-        g = M.zone_geom(o['zone'], T)
+        _, g, _, _ = M.light_place(sh, o)
         if g['shape'] == 'circle':
             n = 40; t = np.linspace(0, 2 * np.pi, n, endpoint=False)
             V = np.c_[np.r_[0, g['r'] * np.cos(t)], np.r_[0, g['r'] * np.sin(t)], np.full(n + 1, 0.014)].astype(np.float32)
@@ -168,7 +168,10 @@ class Stage3D(gl.GLViewWidget):
 
     def place(self, i, o, dx, dy, a):
         if 0 <= i < len(self.objs):
-            self.objs[i].place(o['x'] + dx, o['y'] + dy, a)
+            if o['kind'] == 'light' and getattr(self, 'sh', None):
+                _, _, x, y = M.light_place(self.sh, o, dx, dy); self.objs[i].place(x, y, a)
+            else:
+                self.objs[i].place(o['x'] + dx, o['y'] + dy, a)
 
     # ------------------------------------------------ telecamera
     def apply_camera(self, c):
