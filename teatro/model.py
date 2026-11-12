@@ -240,6 +240,20 @@ def prune_objs(sc):
     return sc
 
 
+def follow_pos(objs, pos):
+    """le luci "<luce> su <personaggio>" stanno sempre sul personaggio: mai una copia ferma al punto di partenza"""
+    out = np.array(pos, float).copy()
+    if out.ndim != 2 or len(out) != len(objs):
+        return out
+    chars = {o['label']: i for i, o in enumerate(objs) if o['kind'] == 'char'}
+    for i, o in enumerate(objs):
+        if o['kind'] == 'light' and o.get('zone') == FOLLOW and ' su ' in o['label']:
+            c = chars.get(o['label'].rsplit(' su ', 1)[1])
+            if c is not None:
+                out[i, 0] = objs[c]['x'] + out[c, 0] - o['x']; out[i, 1] = objs[c]['y'] + out[c, 1] - o['y']
+    return out
+
+
 def state_at(sc, m):
     """[dx, dy, visibile] di ogni oggetto dopo i primi m passi"""
     objs = sc['objects']
@@ -258,6 +272,8 @@ def state_at(sc, m):
                 st[i, 2] = 1
             elif e['cls'] == 'exit':
                 st[i, 2] = 0
+    if len(objs):
+        st[:, :2] = follow_pos(objs, st[:, :2])
     return st
 
 

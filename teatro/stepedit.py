@@ -110,11 +110,11 @@ class StepEditor(QtWidgets.QDialog):
         return self.add_obj(M.new_obj(M.new_uid(self.sh), 'light', Lt['name'], lab, center[0], center[1], Lt['rgb'], Lt['zone']))
 
     def draw(self):
-        items = []
+        items = []; P = M.follow_pos(self.objs, [self.cur_pos(i) for i in range(len(self.objs))]) if self.objs else []
         for i, o in enumerate(self.objs):
             if not self.cur_vis(i) or (o['kind'] == 'light' and o['zone'] != M.FOLLOW):
                 continue
-            p = self.cur_pos(i); items.append((o, p[0], p[1], 1))
+            items.append((o, P[i][0], P[i][1], 1))
         paths = []
         for e in self.eff:
             if e['cls'] != 'path' or e['dur'] < 0.05:
@@ -236,6 +236,11 @@ class StepEditor(QtWidgets.QDialog):
                 self.eff.append(M.mk_eff('path', lo['id'], [self.cur_pos(il), [self.P[0][0] - lorg[0], self.P[0][1] - lorg[1]]], 0.01, max(0, dl - 0.5)))
                 self.eff.append(M.mk_eff('entr', lo['id'], [], 0.5, max(0, dl - 0.5)))
             self.eff.append(M.mk_eff('path', lo['id'], M.simplify_path([(a - lorg[0], b - lorg[1]) for a, b in self.P]), du, dl))
+        if ty == 0 and o['kind'] == 'char':           # le luci gia' accese su questo personaggio lo seguono
+            done = {e['spid'] for e in self.eff if e['cls'] == 'path'}
+            for i, x in enumerate(self.objs):
+                if x['kind'] == 'light' and x['label'].endswith(' su ' + o['label']) and x['id'] not in done and self.cur_vis(i):
+                    self.eff.append(M.mk_eff('path', x['id'], M.simplify_path([(a - x['x'], b - x['y']) for a, b in self.P]), du, dl))
         self.show_actions(); self.new_action()
         self.msg('Azione aggiunta. Scegli un altro personaggio o elemento per farlo muovere in contemporanea, oppure "Salva passo".')
 

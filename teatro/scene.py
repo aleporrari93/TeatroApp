@@ -134,10 +134,11 @@ class SceneWindow(QtWidgets.QWidget):
 
     # ------------------------------------------------ stato e disegno
     def redraw(self):
-        self.plan.set_items([(o, self.pos[i, 0], self.pos[i, 1], self.A[i]) for i, o in enumerate(self.objs)])
+        P = M.follow_pos(self.objs, self.pos) if len(self.objs) else self.pos
+        self.plan.set_items([(o, P[i, 0], P[i, 1], self.A[i]) for i, o in enumerate(self.objs)])
         if self.view3 and self.built3:
             for i, o in enumerate(self.objs):
-                self.v3d.place(i, o, self.pos[i, 0], self.pos[i, 1], self.A[i])
+                self.v3d.place(i, o, P[i, 0], P[i, 1], self.A[i])
 
     def reset(self):
         self.stop_all(); self.step = 0
