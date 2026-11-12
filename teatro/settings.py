@@ -262,7 +262,7 @@ class ElementsTab(QtWidgets.QWidget):
             e = QtWidgets.QLineEdit(); e.setMaximumWidth(70); e.editingFinished.connect(self.read); hs.addWidget(e); self.eS.append(e)
         self.bC = ColorButton(); self.bC.changed.connect(lambda *_: self.read()); hs.addWidget(self.bC); hs.addStretch(1)
         f.addRow("Larghezza, profondita', altezza (m) e colore", hs)
-        self.cF = QtWidgets.QCheckBox('Fisso: presente in tutte le scene, sempre nello stesso punto'); self.cF.toggled.connect(lambda *_: self.read())
+        self.cF = QtWidgets.QCheckBox('Fisso (in tutte le scene)'); self.cF.toggled.connect(lambda *_: self.read())
         f.addRow('', self.cF)
         hp = QtWidgets.QHBoxLayout(); self.eP = []
         for _ in range(3):
