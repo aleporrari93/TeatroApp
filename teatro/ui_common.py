@@ -9,9 +9,38 @@ def _screen_rect():
 def fit_window(w, width, height):
     """dimensiona la finestra senza mai superare lo schermo (lascia spazio alla barra del titolo) e la centra"""
     av = _screen_rect()
-    W = min(int(width), int(av.width() * 0.96)); H = min(int(height), int(av.height() * 0.90))
+    W = min(int(width), av.width() - 16); H = min(int(height), int(av.height() * 0.90), av.height() - 40)
     # setGeometry (non move/resize: alcune finestre hanno un loro metodo 'move'); 30 px per la barra del titolo
     w.setGeometry(av.x() + max(0, (av.width() - W) // 2), av.y() + 30 + max(0, int((av.height() - 30 - H) * 0.35)), W, H)
+
+
+def screen_limit(w):
+    """la finestra non puo' diventare piu' grande dello schermo (barra del titolo compresa) ne' uscirne"""
+    if not w.isWindow():
+        return
+    av = _screen_rect(); mw, mh = av.width() - 16, av.height() - 40
+    w.setMaximumSize(mw, mh)
+    g = w.geometry(); W = min(g.width(), mw); H = min(g.height(), mh)
+    x = min(max(g.x(), av.x() + 8), av.x() + av.width() - W - 8); y = min(max(g.y(), av.y() + 32), av.y() + av.height() - H - 8)
+    if (x, y, W, H) != (g.x(), g.y(), g.width(), g.height()):
+        w.setGeometry(x, y, W, H)
+
+
+class ScreenGuard(QtCore.QObject):
+    """applicato a tutta l'applicazione: ogni finestra che si apre viene tenuta dentro lo schermo"""
+    def eventFilter(self, obj, ev):
+        try:
+            if ev.type() == QtCore.QEvent.Show and isinstance(obj, QtWidgets.QWidget) and obj.isWindow() \
+                    and obj.windowType() in (QtCore.Qt.Window, QtCore.Qt.Dialog):
+                screen_limit(obj)
+        except Exception:
+            pass
+        return False
+
+
+def install_screen_guard(app):
+    g = ScreenGuard(app); app.installEventFilter(g); app._screen_guard = g
+    return g
 
 
 def window_layout(w, cls=None):

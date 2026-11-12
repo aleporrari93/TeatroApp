@@ -114,9 +114,7 @@ class Stage3D(gl.GLViewWidget):
             except Exception:
                 done = False
         if T['back'] == 'Modello 3D' and T['backModel']:
-            BP = L.backdrop_parts(folder, T)
-            yb = max([D] + [float(p['V'][:, 1].max()) for p in BP if len(p['V'])]) + 0.3
-            self.addItem(_flat(*_quad(xa, xb, yb, yb, 0, H, True), (0.02, 0.02, 0.025)))    # nero dietro al modello
+            BP = L.backdrop_parts(folder, T)               # solo il modello: nessun altro fondale
             for it in mesh_items(BP):
                 self.addItem(it)
             done = bool(BP)

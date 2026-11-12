@@ -11,8 +11,9 @@ paths.lib_dir = lambda: real_lib
 import teatro.library as L
 L.lib_dir = paths.lib_dir
 app = QtWidgets.QApplication(sys.argv)
-from teatro.ui_common import STYLE
+from teatro.ui_common import STYLE, install_screen_guard
 app.setStyleSheet(STYLE)
+install_screen_guard(app)
 errors = []
 
 def step(name, f):
@@ -43,6 +44,8 @@ def fits(win):
     av = app.primaryScreen().availableGeometry(); g = win.geometry()
     print('     ', type(win).__name__, g.width(), 'x', g.height(), 'schermo', av.width(), 'x', av.height())
     assert g.width() <= av.width() and g.height() <= av.height(), 'finestra piu\' grande dello schermo'
+    win.resize(5000, 5000); app.processEvents(); g = win.geometry()
+    assert g.width() <= av.width() and g.height() <= av.height(), 'si puo\' allargare oltre lo schermo'
     assert g.left() >= av.left() and g.top() >= av.top(), 'finestra fuori dallo schermo'
 step('impostazioni nello schermo', lambda: fits(s))
 pump(); step('chiudi impostazioni', s.close); pump()

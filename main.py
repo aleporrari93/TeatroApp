@@ -9,8 +9,9 @@ def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName('TeatroApp')
-    from teatro.ui_common import STYLE, error
+    from teatro.ui_common import STYLE, error, install_screen_guard
     app.setStyleSheet(STYLE)
+    install_screen_guard(app)
 
     def excepthook(t, v, tb):
         msg = ''.join(traceback.format_exception(t, v, tb))
