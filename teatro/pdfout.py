@@ -95,13 +95,16 @@ def scene_pdf(path, sh, sc, cue_times=None, image_png=None):
     doc.build(S)
 
 
-def script_pdf(path, sh, folder):
+def script_pdf(path, sh, folder, char=None):
+    """copione completo, oppure (char = nome) solo le scene in cui compare quel personaggio, con tutte le parti di quelle scene"""
     M.sort_scenes(sh)
-    doc = _Doc(path, sh['title'])
-    S = [Paragraph(_esc(sh['title']), ST['title']), Spacer(1, 4), Paragraph('Copione di regia  -  elenco delle scene', ST['sub']), Spacer(1, 18)]
-    for sc in sh['scenes']:
+    scenes = [sc for sc in sh['scenes'] if char is None or M.char_in_scene(sc, char)]
+    doc = _Doc(path, sh['title'] + (' - ' + char if char else ''))
+    sub = 'Copione per %s  -  scene in cui compare (%d)' % (char, len(scenes)) if char else 'Copione di regia  -  elenco delle scene'
+    S = [Paragraph(_esc(sh['title']), ST['title']), Spacer(1, 4), Paragraph(_esc(sub), ST['sub']), Spacer(1, 18)]
+    for sc in scenes:
         S.append(Paragraph(_esc('Atto %s    Scena %d    %s' % (M.roman(sc['act']), sc['num'], sc['title'])), ST['toc']))
-    for sc in sh['scenes']:
+    for sc in scenes:
         T, _ = M.read_cues(M.cue_path(folder, sc), len(sc['steps']))
         S += [PageBreak()] + scene_story(sh, sc, T)
     doc.build(S)

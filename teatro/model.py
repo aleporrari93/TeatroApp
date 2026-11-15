@@ -220,6 +220,12 @@ def light_place(sh, o, dx=0.0, dy=0.0):
     return zone, g, g['cx'], g['cy']
 
 
+def char_in_scene(sc, name):
+    """il personaggio compare nella scena (e' sulla pianta o nel cast della scena)"""
+    return any(o['kind'] == 'char' and o['ref'] == name for o in sc['objects']) or \
+        any(c.get('name') == name for c in sc.get('cast', []))
+
+
 def find_char(sh, name):
     for c in sh['chars']:
         if c['name'] == name:

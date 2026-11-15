@@ -11,7 +11,7 @@ from . import model as M
 from . import pdfout
 from .demo import make_demo
 from .paths import shows_dir
-from .ui_common import ask_text, button, fit_window, window_layout, confirm, error, info, label, open_folder
+from .ui_common import ask_choice, ask_text, button, fit_window, window_layout, confirm, error, info, label, open_folder
 
 
 class App:
@@ -196,7 +196,7 @@ class ShowWindow(QtWidgets.QWidget):
         v.addWidget(button('Duplica scena', self.dup_scene))
         v.addWidget(button('Elimina scena', self.del_scene))
         v.addSpacing(12)
-        v.addWidget(button('⎙  Stampa intero copione', self.print_script, True, 'PDF con una pagina per scena: titolo, atto, numero e passi'))
+        v.addWidget(button('⎙  Stampa copione', self.print_script, True, 'PDF completo, oppure solo le scene di un personaggio (con tutte le parti)'))
         v.addWidget(button('Salva', self.do_save))
         v.addWidget(button('◀  I miei spettacoli', app.back_home))
         v.addStretch(1)
@@ -317,11 +317,18 @@ class ShowWindow(QtWidgets.QWidget):
         sh = self.app.sh
         if not sh['scenes']:
             info(self, 'Lo spettacolo non ha ancora scene.'); return
-        fn, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Salva l'intero copione in PDF",
-                                                      os.path.join(self.app.folder, M.safe_name(sh['title']) + ' - copione.pdf'), 'PDF (*.pdf)')
+        names = [c['name'] for c in sh['chars']]
+        k = ask_choice(self, 'Stampa copione', 'Stampa copione per:', ['Tutti (copione completo)'] + names)
+        if k is None:
+            return
+        who = names[k - 1] if k > 0 else None
+        if who and not any(M.char_in_scene(sc, who) for sc in sh['scenes']):
+            info(self, '%s non compare in nessuna scena.' % who); return
+        fn, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Salva il copione in PDF', os.path.join(
+            self.app.folder, M.safe_name(sh['title']) + ' - copione' + (' ' + M.safe_name(who) if who else '') + '.pdf'), 'PDF (*.pdf)')
         if not fn:
             return
         try:
-            pdfout.script_pdf(fn, sh, self.app.folder); self.msg('Copione salvato: ' + fn); info(self, 'Copione salvato in:\n' + fn)
+            pdfout.script_pdf(fn, sh, self.app.folder, who); self.msg('Copione salvato: ' + fn); info(self, 'Copione salvato in:\n' + fn)
         except Exception as e:
             error(self, 'Errore nella creazione del copione: %s' % e)

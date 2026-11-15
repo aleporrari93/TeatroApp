@@ -153,6 +153,18 @@ def ask_text(parent, title, fields, defaults=None):
     return [e.text().strip() for e in eds]
 
 
+def ask_choice(parent, title, text, items, current=0):
+    """finestra con un menu a tendina; ritorna l'indice scelto o None"""
+    d = QtWidgets.QDialog(parent); d.setWindowTitle(title); lay = QtWidgets.QVBoxLayout(d)
+    lay.addWidget(QtWidgets.QLabel(text)); cb = QtWidgets.QComboBox(); cb.addItems(items); cb.setCurrentIndex(current)
+    cb.setMinimumWidth(300); lay.addWidget(cb)
+    bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+    bb.accepted.connect(d.accept); bb.rejected.connect(d.reject); lay.addWidget(bb)
+    if d.exec() != QtWidgets.QDialog.Accepted:
+        return None
+    return cb.currentIndex()
+
+
 def confirm(parent, text, title='Conferma', yes='Si'):
     r = QtWidgets.QMessageBox.question(parent, title, text, QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
     return r == QtWidgets.QMessageBox.Yes
